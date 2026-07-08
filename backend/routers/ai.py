@@ -14,7 +14,12 @@ load_dotenv()
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def get_groq_client() -> Groq:
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise RuntimeError("GROQ_API_KEY is not configured")
+    return Groq(api_key=api_key)
 
 
 @router.post("/prioritize", response_model=schemas.PrioritizeResponse)
@@ -48,7 +53,7 @@ def prioritize_tasks(db: Session = Depends(get_db)):
     )
 
     try:
-        completion = client.chat.completions.create(
+        completion = get_groq_client().chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": system_prompt},
