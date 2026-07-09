@@ -1,0 +1,43 @@
+# ──────────────────────────────────────
+# Global
+# ──────────────────────────────────────
+namespace: ai-task-manager
+
+# ──────────────────────────────────────
+# PostgreSQL
+# ──────────────────────────────────────
+postgres:
+  image: postgres:16-alpine
+  port: 5432
+  storage: 1Gi
+  credentials:
+    user: taskuser
+    password: taskpass123
+    database: taskdb
+
+# ──────────────────────────────────────
+# Backend
+# ──────────────────────────────────────
+backend:
+  image: lavya30/ai-task-manager-backend:latest
+  replicas: 2
+  port: 8000
+  env:
+    groqApiKey: ""  # Set via --set or secrets
+
+# ──────────────────────────────────────
+# Frontend
+# ──────────────────────────────────────
+frontend:
+  image: lavya30/ai-task-manager-frontend:latest
+  replicas: 2
+  port: 3000
+  env:
+    apiUrl: http://backend:8000
+
+# ──────────────────────────────────────
+# Ingress
+# ──────────────────────────────────────
+ingress:
+  enabled: true
+  host: ai-task-manager.local
